@@ -1,0 +1,207 @@
+
+CyclonEyes.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000b6  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .debug_aranges 00000020  00000000  00000000  0000010a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  2 .debug_pubnames 0000001b  00000000  00000000  0000012a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  3 .debug_info   0000016c  00000000  00000000  00000145  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_abbrev 000000df  00000000  00000000  000002b1  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_line   00000193  00000000  00000000  00000390  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_frame  00000020  00000000  00000000  00000524  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_str    000000eb  00000000  00000000  00000544  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_loc    000000b8  00000000  00000000  0000062f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_ranges 00000048  00000000  00000000  000006e7  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	12 c0       	rjmp	.+36     	; 0x26 <__ctors_end>
+   2:	19 c0       	rjmp	.+50     	; 0x36 <__bad_interrupt>
+   4:	18 c0       	rjmp	.+48     	; 0x36 <__bad_interrupt>
+   6:	17 c0       	rjmp	.+46     	; 0x36 <__bad_interrupt>
+   8:	16 c0       	rjmp	.+44     	; 0x36 <__bad_interrupt>
+   a:	15 c0       	rjmp	.+42     	; 0x36 <__bad_interrupt>
+   c:	14 c0       	rjmp	.+40     	; 0x36 <__bad_interrupt>
+   e:	13 c0       	rjmp	.+38     	; 0x36 <__bad_interrupt>
+  10:	12 c0       	rjmp	.+36     	; 0x36 <__bad_interrupt>
+  12:	11 c0       	rjmp	.+34     	; 0x36 <__bad_interrupt>
+  14:	10 c0       	rjmp	.+32     	; 0x36 <__bad_interrupt>
+  16:	0f c0       	rjmp	.+30     	; 0x36 <__bad_interrupt>
+  18:	0e c0       	rjmp	.+28     	; 0x36 <__bad_interrupt>
+  1a:	0d c0       	rjmp	.+26     	; 0x36 <__bad_interrupt>
+  1c:	0c c0       	rjmp	.+24     	; 0x36 <__bad_interrupt>
+  1e:	0b c0       	rjmp	.+22     	; 0x36 <__bad_interrupt>
+  20:	0a c0       	rjmp	.+20     	; 0x36 <__bad_interrupt>
+  22:	09 c0       	rjmp	.+18     	; 0x36 <__bad_interrupt>
+  24:	08 c0       	rjmp	.+16     	; 0x36 <__bad_interrupt>
+
+00000026 <__ctors_end>:
+  26:	11 24       	eor	r1, r1
+  28:	1f be       	out	0x3f, r1	; 63
+  2a:	cf e5       	ldi	r28, 0x5F	; 95
+  2c:	d4 e0       	ldi	r29, 0x04	; 4
+  2e:	de bf       	out	0x3e, r29	; 62
+  30:	cd bf       	out	0x3d, r28	; 61
+  32:	02 d0       	rcall	.+4      	; 0x38 <main>
+  34:	3e c0       	rjmp	.+124    	; 0xb2 <_exit>
+
+00000036 <__bad_interrupt>:
+  36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
+
+00000038 <main>:
+#define LED_PIN PINB
+#define LED_DDR DDRB
+
+typedef uint8_t uint;
+
+int main(void)
+  38:	ef 92       	push	r14
+  3a:	ff 92       	push	r15
+  3c:	1f 93       	push	r17
+  3e:	cf 93       	push	r28
+  40:	df 93       	push	r29
+{
+    uint i;
+	LED_DDR = 0xFF;
+  42:	8f ef       	ldi	r24, 0xFF	; 255
+  44:	87 bb       	out	0x17, r24	; 23
+	
+    while (1) 
+    {
+		while(i < 7){
+			LED_PORT = (1 << i);
+  46:	a1 e0       	ldi	r26, 0x01	; 1
+  48:	b0 e0       	ldi	r27, 0x00	; 0
+  4a:	c8 e3       	ldi	r28, 0x38	; 56
+  4c:	d0 e0       	ldi	r29, 0x00	; 0
+  4e:	0f 2e       	mov	r0, r31
+  50:	f2 e5       	ldi	r31, 0x52	; 82
+  52:	ef 2e       	mov	r14, r31
+  54:	f3 e0       	ldi	r31, 0x03	; 3
+  56:	ff 2e       	mov	r15, r31
+  58:	f0 2d       	mov	r31, r0
+	__asm__ volatile (
+		"1: sbiw %0,1" "\n\t"
+		"brne 1b"
+		: "=w" (__count)
+		: "0" (__count)
+	);
+  5a:	40 e9       	ldi	r20, 0x90	; 144
+  5c:	51 e0       	ldi	r21, 0x01	; 1
+			_delay_ms(DELAYTIME);
+			i++;
+		}
+		
+		while (i > 0){
+			LED_PORT = (1 << i);
+  5e:	c7 01       	movw	r24, r14
+  60:	7e 2d       	mov	r23, r14
+  62:	19 2f       	mov	r17, r25
+  64:	10 c0       	rjmp	.+32     	; 0x86 <__SREG__+0x47>
+	LED_DDR = 0xFF;
+	
+    while (1) 
+    {
+		while(i < 7){
+			LED_PORT = (1 << i);
+  66:	cd 01       	movw	r24, r26
+  68:	06 2e       	mov	r0, r22
+  6a:	02 c0       	rjmp	.+4      	; 0x70 <__SREG__+0x31>
+  6c:	88 0f       	add	r24, r24
+  6e:	99 1f       	adc	r25, r25
+  70:	0a 94       	dec	r0
+  72:	e2 f7       	brpl	.-8      	; 0x6c <__SREG__+0x2d>
+  74:	88 83       	st	Y, r24
+  76:	97 01       	movw	r18, r14
+  78:	ca 01       	movw	r24, r20
+  7a:	01 97       	sbiw	r24, 0x01	; 1
+  7c:	f1 f7       	brne	.-4      	; 0x7a <__SREG__+0x3b>
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+  7e:	21 50       	subi	r18, 0x01	; 1
+  80:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+  82:	d1 f7       	brne	.-12     	; 0x78 <__SREG__+0x39>
+			_delay_ms(DELAYTIME);
+			i++;
+  84:	6f 5f       	subi	r22, 0xFF	; 255
+    uint i;
+	LED_DDR = 0xFF;
+	
+    while (1) 
+    {
+		while(i < 7){
+  86:	67 30       	cpi	r22, 0x07	; 7
+  88:	70 f3       	brcs	.-36     	; 0x66 <__SREG__+0x27>
+			LED_PORT = (1 << i);
+			_delay_ms(DELAYTIME);
+			i++;
+		}
+		
+		while (i > 0){
+  8a:	66 23       	and	r22, r22
+  8c:	e1 f3       	breq	.-8      	; 0x86 <__SREG__+0x47>
+			LED_PORT = (1 << i);
+  8e:	cd 01       	movw	r24, r26
+  90:	06 2e       	mov	r0, r22
+  92:	02 c0       	rjmp	.+4      	; 0x98 <__SREG__+0x59>
+  94:	88 0f       	add	r24, r24
+  96:	99 1f       	adc	r25, r25
+  98:	0a 94       	dec	r0
+  9a:	e2 f7       	brpl	.-8      	; 0x94 <__SREG__+0x55>
+  9c:	88 83       	st	Y, r24
+  9e:	87 2f       	mov	r24, r23
+  a0:	91 2f       	mov	r25, r17
+  a2:	fa 01       	movw	r30, r20
+  a4:	31 97       	sbiw	r30, 0x01	; 1
+  a6:	f1 f7       	brne	.-4      	; 0xa4 <__SREG__+0x65>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+  a8:	01 97       	sbiw	r24, 0x01	; 1
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+  aa:	d9 f7       	brne	.-10     	; 0xa2 <__SREG__+0x63>
+			_delay_ms(DELAYTIME);
+			i--;
+  ac:	61 50       	subi	r22, 0x01	; 1
+			LED_PORT = (1 << i);
+			_delay_ms(DELAYTIME);
+			i++;
+		}
+		
+		while (i > 0){
+  ae:	79 f7       	brne	.-34     	; 0x8e <__SREG__+0x4f>
+  b0:	ea cf       	rjmp	.-44     	; 0x86 <__SREG__+0x47>
+
+000000b2 <_exit>:
+  b2:	f8 94       	cli
+
+000000b4 <__stop_program>:
+  b4:	ff cf       	rjmp	.-2      	; 0xb4 <__stop_program>
