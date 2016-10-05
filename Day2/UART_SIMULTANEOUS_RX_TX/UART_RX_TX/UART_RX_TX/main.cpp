@@ -5,14 +5,6 @@
  * Author : Manash
  */ 
 
-/*
- * SimpleUART.cpp
- *
- * Created: 10/5/2016 2:41:38 PM
- * Author : Manash
- * CHIP: Test OK on ATmega8
- */ 
-
 // F_CPU must be 8Mhz for 9600 Baud Rate Serial Communication
 #define F_CPU 8000000UL
 
