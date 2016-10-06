@@ -1,4 +1,4 @@
-# 2nd Day of LearningAVR
+# 2nd Day of Learning AVR
 
 ## SimpleUART_AVR_Arduino
 
