@@ -1,3 +1,6 @@
+# Ignore the debug directory
+Debug/
+
 # Compiled Object files
 *.slo
 *.lo
