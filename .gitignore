@@ -1,5 +1,6 @@
 # Ignore the debug directory
 Debug/
+.vs/
 
 # Compiled Object files
 *.slo
