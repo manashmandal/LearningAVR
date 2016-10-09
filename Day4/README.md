@@ -1,7 +1,9 @@
 # 4th Day of Learning AVR
 
-## Multiple ADC Channel Reader 
+## Free Running ADC
 
-Description: It can read multiple ADC channel and sends the reading via UART.
+Description: Non blocking ADC example.
 
-## Multiple ADC Selector
+## ADC Multiplexing
+
+Description: Selecting ADC channels to read from.
