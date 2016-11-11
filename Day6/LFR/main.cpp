@@ -19,7 +19,31 @@
 #include <atmega8/pinDefines.h>
 #include <avr/sfr_defs.h>
 
+#define NUM_SENSOR 6
+#define ON_LINE 1
+#define OFF_LINE 0
+
+int threshold = 400;
+
 int sensors[] = {5, 4, 3, 2, 1, 0};
+int weights[] = {0, 1000, 2000, 3000, 4000, 5000};
+	
+int sensor_value[6];
+
+uint16_t analogRead(uint8_t channel);
+	
+int getPosition(void){
+	int totalValue = 0;
+	for (int i = 0; i < NUM_SENSOR; i++){
+		if (analogRead(i) < threshold){
+			sensor_value[i] = ON_LINE;
+		} else {
+			sensor_value[i] = OFF_LINE;
+		}
+		totalValue += weights[i] * sensor_value[i];
+	}
+	return (totalValue / NUM_SENSOR);
+}
 
 void debugSensor(int pos, int val){
 	char str[50];
@@ -168,10 +192,9 @@ int main(){
 	while(1){
 		//forward(150, 165);
 		USART_Transmit_With_CRNL("----------\n\n");
-		for (int i = 0; i < 6; i++){
-			debugSensor(i, analogRead(sensors[i]));
-			_delay_ms(250);
-		}
+		
+		debugSensor(0, getPosition());
+		
 		USART_Transmit_With_CRNL("----------\n\n");
 		//USART_Transmit_Number_With_CRNL(analogRead(6));
 		_delay_ms(1000);
