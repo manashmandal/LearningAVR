@@ -5,26 +5,45 @@
  * Author : Manash
  */ 
 
-#include <avr/io.h>
 
-#define F_CPU 16000000UL
+//#define F_CPU 16000000UL
 
-#define BAUD 9600
+//#define BAUD 9600
 
-#define MYUBRR F_CPU/16/BAUD - 1
+//#define MYUBRR F_CPU/16/BAUD - 1
 
+#include <atmega8/Serial.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <string.h>
+#include <atmega8/pinDefines.h>
+#include <avr/sfr_defs.h>
 
-unsigned int ENA;
-unsigned int ENB;
+int sensors[] = {0, 1, 2, 3, 4, 5};
+
+void debugSensor(int pos, int val){
+	char str[50];
+	sprintf(str, "IR [%d] = %d", pos, val);
+	USART_Transmit_With_CRNL(str);
+}
 
 void motor_init(void){
 	DDRB |= (1 << PB0);
 	DDRD |= (1 << PD7);
 }
 
+uint16_t analogRead(uint8_t channel){
+	ADMUX = (0xF0 & ADMUX) | channel;
+	ADCSRA |= (1 << ADSC);
+	loop_until_bit_is_clear(ADCSRA, ADSC);
+	return (ADC);
+}
+
+void initADC(void){
+	ADMUX |= (1 << REFS0);
+	ADCSRA |= (1 << ADPS1) | (1 << ADPS0);
+	ADCSRA |= (1 << ADEN);
+}
 
 
 void leftMotorForward(unsigned int speed){
@@ -62,7 +81,7 @@ void backward(unsigned int ls, unsigned int rs){
 	rightMotorBackward(rs);
 }
 
-
+/*
 void USART_Init(unsigned int ubrr)
 {
 	UBRRH = (unsigned char) (ubrr >> 8);
@@ -87,7 +106,7 @@ bool USART_Transmit_String(char* command)
 	}
 	return ok;
 }
-
+*/
 
 static inline void initPWM(void){
 	// Selecting PWM Mode [FastPWM - 8bit]
@@ -142,10 +161,19 @@ int main(void){
 int main(){
 	initPWM();
 	motor_init();
-	USART_Init(MYUBRR);
+	USART_Init(UBRR);
+	initADC();
 	char x[] = "Hello world\r\n";
+	USART_Transmit_String(x);
 	while(1){
 		//forward(150, 165);
-		USART_Transmit_String(x);
+		USART_Transmit_With_CRNL("----------\n\n");
+		for (int i = 0; i < 6; i++){
+			debugSensor(i, analogRead(sensors[i]));
+			_delay_ms(250);
+		}
+		USART_Transmit_With_CRNL("----------\n\n");
+		//USART_Transmit_Number_With_CRNL(analogRead(6));
+		_delay_ms(1000);
 	}
 }
