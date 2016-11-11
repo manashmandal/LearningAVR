@@ -19,7 +19,7 @@
 #include <atmega8/pinDefines.h>
 #include <avr/sfr_defs.h>
 
-int sensors[] = {0, 1, 2, 3, 4, 5};
+int sensors[] = {5, 4, 3, 2, 1, 0};
 
 void debugSensor(int pos, int val){
 	char str[50];
