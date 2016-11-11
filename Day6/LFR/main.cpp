@@ -25,8 +25,9 @@
 
 int threshold = 400;
 
+//int sensors[] = {0, 1, 2, 3, 4, 5};
 int sensors[] = {5, 4, 3, 2, 1, 0};
-int weights[] = {0, 1000, 2000, 3000, 4000, 5000};
+int weights[] = {1000, 2000, 3000, 4000, 5000, 6000};
 	
 int sensor_value[6];
 
@@ -35,7 +36,7 @@ uint16_t analogRead(uint8_t channel);
 int getPosition(void){
 	int totalValue = 0;
 	for (int i = 0; i < NUM_SENSOR; i++){
-		if (analogRead(i) < threshold){
+		if (analogRead(sensors[i]) < threshold){
 			sensor_value[i] = ON_LINE;
 		} else {
 			sensor_value[i] = OFF_LINE;
@@ -182,6 +183,45 @@ int main(void){
 }
 */
 
+void followLine(void){
+	int position = getPosition();
+	USART_Transmit_Number_With_CRNL(position);
+	
+	////HARD RIGHT
+	//if (position > 100 && position < 200){
+		//forward(180, 165);
+	//} 
+	//// SOFT RIGHT
+	//else if (position > 200 && position <= 500){
+		//forward(170, 165);
+	//}
+	//
+	//// HARD LEFT
+	//else if (position >= 2000 && position < 3000){
+		//forward(165, 180);
+	//}
+	//
+	//// SOFT LEFT
+	//else if (position > 1700 && position < 2000) {
+		//forward(165, 170);
+	//}
+	//
+	//// FORWARD
+	//else if (position >= 1000 && position <= 1700){
+		//forward(165, 165);
+	//}
+	//
+	//else {
+		//forward(0, 0);
+	//}
+	
+	if (position >= 1000 && position <= 1666){
+		forward(150, 150);
+	} else {
+		forward(0, 0);
+	}
+}
+
 int main(){
 	initPWM();
 	motor_init();
@@ -191,12 +231,17 @@ int main(){
 	USART_Transmit_String(x);
 	while(1){
 		//forward(150, 165);
-		USART_Transmit_With_CRNL("----------\n\n");
-		
-		debugSensor(0, getPosition());
-		
-		USART_Transmit_With_CRNL("----------\n\n");
+	USART_Transmit_With_CRNL("----------\n\n");
+	for (int i = 0; i < NUM_SENSOR; i++){
+		debugSensor(i, analogRead(sensors[i]));
+		_delay_ms(100);	
+	}
+		//debugSensor(0, getPosition());
+		//followLine();
+		//USART_Transmit_With_CRNL("----------\n\n");
 		//USART_Transmit_Number_With_CRNL(analogRead(6));
 		_delay_ms(1000);
+		
+		
 	}
 }
