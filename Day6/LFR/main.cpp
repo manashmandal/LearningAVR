@@ -11,9 +11,9 @@
 
 int threshold = 400;
 
-//int sensors[] = {0, 1, 2, 3, 4, 5};
-int sensors[] = {5, 4, 3, 2, 1, 0};
-int weights[] = {1000, 2000, 3000, 4000, 5000, 6000};
+int sensors[] = {0, 1, 2, 3, 4, 5};
+//int sensors[] = {5, 4, 3, 2, 1, 0};
+int weights[] = {100, 200, 300, 1000, 2000, 3000};
 	
 int sensor_value[6];
 
@@ -34,6 +34,8 @@ int getPosition(void){
 	
 	if (num_active_sensor == 0)
 		return 0;
+	else if (num_active_sensor == NUM_SENSOR)
+		return 10000;
 	else 
 		return (totalValue / num_active_sensor);
 }
@@ -112,6 +114,9 @@ int main(){
 	char x[] = "Hello world\r\n";
 	USART_Transmit_String(x);
 	while(1){
-		
+		_delay_ms(1000);
+		USART_Transmit_With_CRNL("==================\n");
+		debugSensor(0, getPosition());
+		USART_Transmit_With_CRNL("==================");
 	}
 }
