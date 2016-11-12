@@ -9,8 +9,8 @@
 #define ON_LINE 1
 #define OFF_LINE 0
 
-#define BASE_SPEED 150
-#define DIFF_SPEED 13
+#define BASE_SPEED 120
+#define DIFF_SPEED 15
 
 int threshold = 400;
 
