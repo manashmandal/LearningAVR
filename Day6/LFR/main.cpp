@@ -9,6 +9,9 @@
 #define ON_LINE 1
 #define OFF_LINE 0
 
+#define BASE_SPEED 150
+#define DIFF_SPEED 5
+
 int threshold = 400;
 
 int sensors[] = {0, 1, 2, 3, 4, 5};
@@ -104,6 +107,41 @@ static inline void initPWM(void){
 void followLine(void){
 	int position = getPosition();
 	USART_Transmit_Number_With_CRNL(position);
+	
+	if (position > 600 && position < 1700){
+		forward(BASE_SPEED, BASE_SPEED);
+	} 
+	
+	//Right turns
+	else if (position > 1700 && position < 2200){
+		forward(BASE_SPEED + DIFF_SPEED, BASE_SPEED);	
+	}
+	
+	else if (position > 2200 && position < 2700){
+		forward(BASE_SPEED + 2*DIFF_SPEED, BASE_SPEED);
+	}
+	
+	else if (position > 2700 && position < 3200){
+		forward(BASE_SPEED + 2.5 * DIFF_SPEED, BASE_SPEED - 0.5 * DIFF_SPEED);
+	}
+	
+	//Left turns
+	else if (position > 200 && position < 300){
+		forward(BASE_SPEED, BASE_SPEED + DIFF_SPEED);
+	}
+	
+	else if (position > 120 && position < 170){
+		forward(BASE_SPEED, BASE_SPEED + 2*DIFF_SPEED);
+	}
+	
+	else if (position > 90 && position < 110){
+		forward(BASE_SPEED - 0.5 * DIFF_SPEED, BASE_SPEED + 2.5 * DIFF_SPEED);
+	}
+	
+	else {
+		forward(0, 0);
+	}
+	
 }
 
 int main(){
@@ -114,9 +152,10 @@ int main(){
 	char x[] = "Hello world\r\n";
 	USART_Transmit_String(x);
 	while(1){
-		_delay_ms(1000);
-		USART_Transmit_With_CRNL("==================\n");
-		debugSensor(0, getPosition());
-		USART_Transmit_With_CRNL("==================");
+		//_delay_ms(1000);
+		//USART_Transmit_With_CRNL("==================\n");
+		//debugSensor(0, getPosition());
+		//USART_Transmit_With_CRNL("==================");
+		followLine();
 	}
 }
