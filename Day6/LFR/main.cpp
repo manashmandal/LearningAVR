@@ -135,13 +135,12 @@ bool USART_Transmit_String(char* command)
 
 static inline void initPWM(void){
 	// Selecting PWM Mode [FastPWM - 8bit]
-	TCCR1A |= (1 << WGM12) | (1 << WGM10);
+		// Selecting PWM Mode [FastPWM - 8bit]
+	TCCR1A |= (1 << WGM10);
 	TCCR1B |= (1 << WGM12);
-	
-	TCCR1B |= (1 << CS11) | (1 << CS10);
-	
-	TCCR1A |= (1 << COM1A1) | (1 << COM1B1);
-	TCCR1B |= (1 << COM1B1);
+	TCCR1B |= (1 << CS11);
+	TCCR1A |= (1 << COM1A1);
+	TCCR1A |= (1 << COM1B1);
 	
 	DDRB |= (1 << PB1);
 	DDRB |= (1 << PB2);
