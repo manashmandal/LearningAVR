@@ -69,11 +69,6 @@ void leftMotorForward(unsigned int speed){
 	PORTD |= (1 << PD7);
 }
 
-void leftMotorBackward(unsigned int speed){
-	OCR1A = speed;
-	PORTB |= (1 << PB0);
-	PORTD &= ~(1 << PD7);
-}
 
 void rightMotorForward(unsigned int speed){
 	OCR1B = speed;
@@ -81,11 +76,6 @@ void rightMotorForward(unsigned int speed){
 	PORTD &= ~(1 << PD5);
 }
 
-void rightMotorBackward(unsigned int speed){
-	OCR1B = speed;
-	PORTD &= ~(1 << PD6);
-	PORTD |= (1 << PD5);
-}
 
 
 void forward(unsigned int ls, unsigned int rs){
@@ -93,10 +83,6 @@ void forward(unsigned int ls, unsigned int rs){
 	rightMotorForward(rs);
 }
 
-void backward(unsigned int ls, unsigned int rs){
-	leftMotorBackward(ls);
-	rightMotorBackward(rs);
-}
 
 
 static inline void initPWM(void){
