@@ -10,7 +10,7 @@
 #define OFF_LINE 0
 
 #define BASE_SPEED 120
-#define DIFF_SPEED 15
+#define DIFF_SPEED 17
 
 int threshold = 400;
 
@@ -122,11 +122,11 @@ void followLine(void){
 	}
 	
 	else if (position > 2200 && position < 2700){
-		forward(BASE_SPEED + 2.5*DIFF_SPEED, BASE_SPEED);
+		forward(BASE_SPEED + 3*DIFF_SPEED, BASE_SPEED - 0.5 * DIFF_SPEED);
 	}
 	
 	else if (position > 2700 && position < 3200){
-		forward(BASE_SPEED + 3 * DIFF_SPEED, BASE_SPEED - 0.5 * DIFF_SPEED);
+		forward(BASE_SPEED + 4 * DIFF_SPEED, BASE_SPEED -  DIFF_SPEED);
 	}
 	
 	//Left turns
@@ -139,11 +139,11 @@ void followLine(void){
 	}
 	
 	else if (position > 120 && position < 170){
-		forward(BASE_SPEED, BASE_SPEED + 2.5*DIFF_SPEED);
+		forward(BASE_SPEED - 0.5 * DIFF_SPEED, BASE_SPEED + 3*DIFF_SPEED);
 	}
 	
 	else if (position > 90 && position < 110){
-		forward(BASE_SPEED - 0.5 * DIFF_SPEED, BASE_SPEED + 3 * DIFF_SPEED);
+		forward(BASE_SPEED -  DIFF_SPEED, BASE_SPEED + 4 * DIFF_SPEED);
 	}
 	
 	else {
