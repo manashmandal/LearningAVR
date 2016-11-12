@@ -11,8 +11,12 @@
 
 #define BASE_SPEED 120
 #define DIFF_SPEED 17
+#define DELAY_AFTER_STOP 50
+#define RETRY 2
 
 int threshold = 400;
+
+bool pos_changed = false;
 
 int sensors[] = {0, 1, 2, 3, 4, 5};
 //int sensors[] = {5, 4, 3, 2, 1, 0};
@@ -109,45 +113,65 @@ void followLine(void){
 	USART_Transmit_Number_With_CRNL(position);
 	
 	if (position >= 1400 && position < 1500){
+		pos_changed = true;
 		forward(BASE_SPEED, BASE_SPEED);
 	} 
 	
 	//Right turns
 	else if (position >= 1500 && position < 1600){
+		pos_changed = true;
 		forward(BASE_SPEED + DIFF_SPEED, BASE_SPEED);	
 	}
 	
 	else if (position > 1700 && position < 2200){
+		pos_changed = true;
 		forward(BASE_SPEED + DIFF_SPEED * 2, BASE_SPEED);	
 	}
 	
 	else if (position > 2200 && position < 2700){
+		pos_changed = true;
 		forward(BASE_SPEED + 3*DIFF_SPEED, BASE_SPEED - 0.5 * DIFF_SPEED);
 	}
 	
 	else if (position > 2700 && position < 3200){
+		pos_changed = true;
 		forward(BASE_SPEED + 4 * DIFF_SPEED, BASE_SPEED -  DIFF_SPEED);
 	}
 	
 	//Left turns
 	else if (position > 590 && position < 700){
+		pos_changed = true;
 		forward(BASE_SPEED, BASE_SPEED + DIFF_SPEED);
 	}
 	
 	else if (position > 200 && position < 300){
+		pos_changed = true;
 		forward(BASE_SPEED, BASE_SPEED + 2* DIFF_SPEED);
 	}
 	
 	else if (position > 120 && position < 170){
+		pos_changed = true;
 		forward(BASE_SPEED - 0.5 * DIFF_SPEED, BASE_SPEED + 3*DIFF_SPEED);
 	}
 	
 	else if (position > 90 && position < 110){
+		pos_changed = true;
 		forward(BASE_SPEED -  DIFF_SPEED, BASE_SPEED + 4 * DIFF_SPEED);
 	}
 	
 	else {
-		forward(0, 0);
+		if (pos_changed){
+			for (int i = 0; i < RETRY + 1; i++){
+				forward(BASE_SPEED, BASE_SPEED);
+				_delay_ms(DELAY_AFTER_STOP);
+			}
+			forward(0, 0);
+			pos_changed = false;
+		}
+		
+		else {
+			forward(0, 0);
+		}
 	}
 	
 }
