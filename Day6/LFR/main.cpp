@@ -9,12 +9,12 @@
 #define ON_LINE 1
 #define OFF_LINE 0
 
-#define BASE_SPEED 120
-#define DIFF_SPEED 17
+#define BASE_SPEED 125
+#define DIFF_SPEED 20
 #define DELAY_AFTER_STOP 50
 #define RETRY 2
 
-int threshold = 400;
+unsigned int threshold = 0;
 
 bool pos_changed = false;
 
@@ -22,7 +22,13 @@ int sensors[] = {0, 1, 2, 3, 4, 5};
 //int sensors[] = {5, 4, 3, 2, 1, 0};
 int weights[] = {100, 200, 300, 1000, 2000, 3000};
 	
+int analog_value[6];
 int sensor_value[6];
+
+int max_value = 0;
+int min_value = 0;
+
+int offset = 10;
 
 uint16_t analogRead(uint8_t channel);
 	
@@ -30,7 +36,8 @@ int getPosition(void){
 	int totalValue = 0;
 	int num_active_sensor = 0;
 	for (int i = 0; i < NUM_SENSOR; i++){
-		if (analogRead(sensors[i]) < threshold){
+		analog_value[i] = analogRead(sensors[i]);
+		if (analog_value[i] < threshold){
 			sensor_value[i] = ON_LINE;
 			num_active_sensor++;
 		} else {
@@ -46,6 +53,7 @@ int getPosition(void){
 	else 
 		return (totalValue / num_active_sensor);
 }
+
 
 void debugSensor(int pos, int val){
 	char str[50];
@@ -74,15 +82,15 @@ void initADC(void){
 
 void leftMotorForward(unsigned int speed){
 	OCR1A = speed;
-	PORTB &= ~(1 << PB0);
-	PORTD |= (1 << PD7);
+	//PORTB &= ~(1 << PB0);
+	//PORTD |= (1 << PD7);
 }
 
 
 void rightMotorForward(unsigned int speed){
 	OCR1B = speed;
-	PORTD |= (1 << PD6);
-	PORTD &= ~(1 << PD5);
+	//PORTD |= (1 << PD6);
+	//PORTD &= ~(1 << PD5);
 }
 
 
@@ -176,18 +184,72 @@ void followLine(void){
 	
 }
 
+void ledOn(){
+	PORTB |= (1 << PB0);
+}
+
+void ledOff(){
+	PORTB &= ~(1 << PB0);
+}
+
+//Calibrate while blinking
+void blink(int times, unsigned int delay, void (*cal)(void)){
+	DDRB |= (1 << PB0);
+	
+	for (int i = 0; i < times; i++) {
+		ledOn();
+		cal();
+		_delay_ms(delay);
+		ledOff();
+		cal();
+		_delay_ms(delay);
+	}
+	
+	ledOn();
+	_delay_ms(2000);
+	ledOff();
+	_delay_ms(1000);
+}
+
+void calibrate_max(void){
+	max_value = 0;
+	getPosition();
+	for (int i = 0; i < NUM_SENSOR; i++){
+		if (max_value < analog_value[i]) max_value = analog_value[i];
+	}
+}
+
+void calibrate_min(void){
+	min_value = 0;
+	getPosition();
+	for (int i = 0; i < NUM_SENSOR; i++){
+		if (min_value > analog_value[i]) min_value = analog_value[i];
+	}
+}
+
+void calibrate(void){
+	threshold = (max_value + min_value) / 2;
+}
+
+
+
 int main(){
 	initPWM();
 	motor_init();
 	USART_Init(UBRR);
 	initADC();
+	calibrate();
 	char x[] = "Hello world\r\n";
 	USART_Transmit_String(x);
+	
+	blink(5, 300, calibrate_max);
+	blink(4, 150, calibrate_min);
+	
+	calibrate();
+	
+	USART_Transmit_Number_With_CRNL(threshold);
+	
 	while(1){
-		//_delay_ms(1000);
-		//USART_Transmit_With_CRNL("==================\n");
-		//debugSensor(0, getPosition());
-		//USART_Transmit_With_CRNL("==================");
 		followLine();
 	}
 }
